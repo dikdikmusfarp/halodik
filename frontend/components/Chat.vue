@@ -106,6 +106,8 @@ export default {
       room: {
         name: null,
         last_online: null,
+        online: null,
+        waktu: null,
       },
       user: null,
       users: null,
@@ -139,6 +141,8 @@ export default {
     getChat(id, nama, online, waktu) {
       this.room.name = nama
       this.form.penerima = id
+      this.room.online = online
+      this.room.waktu = waktu
       if (!online) {
         this.room.last_online = waktu
       } else {
@@ -178,7 +182,7 @@ export default {
   watch: {
     'form.penerima': function (newVal, oldVal) {
       this.intervalChat = setInterval(() => {
-        this.getChat(this.form.penerima);
+        this.getChat(this.form.penerima, this.room.name, this.room.online, this.room.waktu );
       }, 5000);
     },
   },
