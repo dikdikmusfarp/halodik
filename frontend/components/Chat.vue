@@ -68,11 +68,15 @@
             </div>
             <div class="chat-message clearfix">
               <div class="input-group mb-0">
-                <input type="text" v-model="form.isi" class="form-control" placeholder="Enter text here...">
+                <input type="text" v-model="form.isi" :class="{ 'is-invalid': $v.form.isi.$error }" class="form-control"
+                  placeholder="Enter text here...">
                 <div class="input-group-prepend" v-on:click="submit()">
                   <span class="input-group-text">
                     <BIconArrowRightCircleFill></BIconArrowRightCircleFill>
                   </span>
+                </div>
+                <div v-if="$v.form.isi.$error" class="invalid-feedback">
+                  <span v-if="!$v.form.isi.required">Harus isi pesan.</span>
                 </div>
               </div>
             </div>
@@ -85,6 +89,7 @@
 
 <script>
 import { BIconChatLeftDotsFill, BIconArrowRightCircleFill, BIconSearch } from 'bootstrap-vue'
+import { required } from "vuelidate/lib/validators";
 
 export default {
   components: {
@@ -109,6 +114,14 @@ export default {
         search: null,
       },
     };
+  },
+  validations: {
+    form: {
+      // BAGIAN PELAPOR
+      isi: {
+        required
+      },
+    },
   },
   methods: {
     async getContact() {
@@ -139,20 +152,26 @@ export default {
         });
     },
     submit() {
-      let form = this.form;
-      this.$store
-        .dispatch("chat/store", { form })
-        .then((resp) => {
-          this.form.isi = null
-          this.getChat(this.form.penerima)
-        })
-        .catch((error) => {
-        });
+      this.$v.$touch();
+      if (this.$v.$invalid) {
+      }
+      else {
+        let form = this.form;
+        this.$store
+          .dispatch("chat/store", { form })
+          .then((resp) => {
+            this.form.isi = null
+            this.getChat(this.form.penerima)
+            this.$v.$reset();
+          })
+          .catch((error) => {
+          });
+      }
     },
     debounceSearch(val) {
       clearTimeout(this.debounce)
       this.debounce = setTimeout(() => {
-          this.getContact()
+        this.getContact()
       }, 600)
     },
   },
